@@ -217,19 +217,23 @@ async def generate_video(
 
     print("Saving video to:", output_path)
 
-    final.write_videofile(
-        output_path,
-        fps=30,
-        codec="libx264",
-        audio_codec="aac",
-        logger=None
-    )
+    try:
+        final.write_videofile(
+            output_path,
+            fps=30,
+            codec="libx264",
+            audio_codec="aac",
+        )
+    except Exception as e:
+        print("VIDEO ERROR:", repr(e))
+        raise
 
-    for clip in clips:
-        clip.close()
+    finally:
+        for clip in clips:
+            clip.close()
 
-    final.close()
+        final.close()
 
-    gc.collect()
+        gc.collect()
 
     return output_path
