@@ -21,6 +21,7 @@ UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+LAST_VIDEO = ""
 
 @app.get("/")
 async def home(request: Request):
@@ -105,7 +106,11 @@ async def generate(request: Request):
 
     print(words)
 
-    await generate_video(
+    
+
+    global LAST_VIDEO
+
+    LAST_VIDEO = await generate_video(
         words,
         signature,
         academy,
@@ -123,8 +128,10 @@ async def generate(request: Request):
 @app.get("/download")
 async def download():
 
+    global LAST_VIDEO
+
     return FileResponse(
-        "output/Vocabulary.mp4",
+        LAST_VIDEO,
         media_type="video/mp4",
         filename="Vocabulary.mp4"
     )
