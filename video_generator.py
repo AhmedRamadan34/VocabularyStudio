@@ -85,7 +85,7 @@ def create_clip(
             stroke_color="black",
             stroke_width=3
         )
-        .with_position(("center", 1400))
+        .with_position(("center", 700))
         .with_duration(audio.duration + 1)
     )
 
@@ -104,7 +104,7 @@ def create_clip(
                 stroke_color="black",
                 stroke_width=2
             )
-            .with_position(("center", 1520))
+            .with_position(("center", 770))
             .with_duration(audio.duration + 1)
         )
 
@@ -116,12 +116,14 @@ def create_clip(
             TextClip(
                 text=signature,
                 font=FONT,
-                font_size=30,
+                font_size=18,
                 color="white",
                 stroke_color="black",
-                stroke_width=1
+                stroke_width=1,
+                size=(420, None),
+                method="caption"
             )
-            .with_position((165, HEIGHT - 205))
+            .with_position((100, HEIGHT - 92))
             .with_duration(audio.duration + 1)
         )
 
@@ -133,12 +135,14 @@ def create_clip(
             TextClip(
                 text=academy,
                 font=FONT,
-                font_size=24,
+                font_size=15,
                 color="#d9d9d9",
                 stroke_color="black",
-                stroke_width=1
+                stroke_width=1,
+                size=(420, None),
+                method="caption"
             )
-            .with_position((165, HEIGHT - 170))
+            .with_position((100, HEIGHT - 65))
             .with_duration(audio.duration + 1)
         )
 
@@ -148,8 +152,8 @@ def create_clip(
 
         logo = (
             ImageClip(logo_path)
-            .resized(width=110)
-            .with_position((35, HEIGHT - 230))
+            .resized(width=70)
+            .with_position((20, HEIGHT - 105))
             .with_duration(audio.duration + 1)
         )
 
