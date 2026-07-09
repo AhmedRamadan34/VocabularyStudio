@@ -88,9 +88,13 @@ def create_clip(
         font_size=52,
         color="white",
         stroke_color="black",
-        stroke_width=3,
+        stroke_width=2,
         method="caption",
-        size=(480, None)
+        size=(480, 120),
+        text_align="center",
+        horizontal_align="center",
+        vertical_align="center",
+        interline=0
     ).with_duration(duration)
 
     # نبدأ الكتلة النصية كلها من نقطة ثابتة فوق منتصف الشاشة شوية
@@ -115,9 +119,13 @@ def create_clip(
             font_size=38,
             color="yellow",
             stroke_color="black",
-            stroke_width=2,
+            stroke_width=1,
             method="caption",
-            size=(480, None)
+            size=(480, 100),
+            text_align="center",
+            horizontal_align="center",
+            vertical_align="center",
+            interline=0
         ).with_duration(duration)
 
         arabic_clip = arabic_clip.with_position(("center", current_y))
