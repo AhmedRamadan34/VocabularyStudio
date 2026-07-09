@@ -69,99 +69,116 @@ def create_clip(
 ):
 
     audio = AudioFileClip(audio_file)
+    duration = audio.duration + 1
 
     bg = (
         ImageClip(image_path)
         .resized((WIDTH, HEIGHT))
-        .with_duration(audio.duration + 1)
+        .with_duration(duration)
     )
 
-    english = (
-        TextClip(
-            text=word,
-            font=FONT,
-            font_size=58,
-            color="white",
-            stroke_color="black",
-            stroke_width=3,
-            method="caption",
-            size=(480, None)
-        )
-        .with_position(("center", 660))
-        .with_duration(audio.duration + 1)
-    )
+    clips = [bg]
 
-    clips = [bg, english]
+    # ---------------------------------------------------------
+    # الكلمة الإنجليزية
+    # ---------------------------------------------------------
+    english = TextClip(
+        text=word,
+        font=FONT,
+        font_size=52,
+        color="white",
+        stroke_color="black",
+        stroke_width=3,
+        method="caption",
+        size=(480, None)
+    ).with_duration(duration)
 
+    # نبدأ الكتلة النصية كلها من نقطة ثابتة فوق منتصف الشاشة شوية
+    text_block_top = 600
+
+    english = english.with_position(("center", text_block_top))
+    clips.append(english)
+
+    # نحسب أسفل الكلمة الإنجليزية فعليًا (ارتفاعها الحقيقي بعد الرسم)
+    current_y = text_block_top + english.h + 12
+
+    # ---------------------------------------------------------
+    # الكلمة العربية
+    # ---------------------------------------------------------
     if arabic:
 
-        arabic = fix_arabic(arabic)
+        arabic_fixed = fix_arabic(arabic)
 
-        arabic_clip = (
-            TextClip(
-                text=arabic,
-                font=FONT,
-                font_size=42,
-                color="yellow",
-                stroke_color="black",
-                stroke_width=2,
-                method="caption",
-                size=(480, None)
-            )
-            .with_position(("center", 735))
-            .with_duration(audio.duration + 1)
-        )
+        arabic_clip = TextClip(
+            text=arabic_fixed,
+            font=FONT,
+            font_size=38,
+            color="yellow",
+            stroke_color="black",
+            stroke_width=2,
+            method="caption",
+            size=(480, None)
+        ).with_duration(duration)
 
+        arabic_clip = arabic_clip.with_position(("center", current_y))
         clips.append(arabic_clip)
 
-    if signature:
+        current_y += arabic_clip.h + 12
 
-        signature_clip = (
-            TextClip(
-                text=signature,
-                font=FONT,
-                font_size=20,
-                color="white",
-                stroke_color="black",
-                stroke_width=1,
-                size=(420, None),
-                method="caption"
-            )
-            .with_position((105, HEIGHT - 100))
-            .with_duration(audio.duration + 1)
-        )
+    # ---------------------------------------------------------
+    # شريط المعلومات السفلي: لوجو + توقيع + اسم الأكاديمية
+    # كلهم بيتحسبوا بالنسبة لبعض عشان محدش يقص التاني
+    # ---------------------------------------------------------
+    bottom_margin = 30
+    logo_size = 60
 
-        clips.append(signature_clip)
+    footer_top = HEIGHT - bottom_margin - logo_size
 
-    if academy:
-
-        academy_clip = (
-            TextClip(
-                text=academy,
-                font=FONT,
-                font_size=16,
-                color="#d9d9d9",
-                stroke_color="black",
-                stroke_width=1,
-                size=(420, None),
-                method="caption"
-            )
-            .with_position((105, HEIGHT - 70))
-            .with_duration(audio.duration + 1)
-        )
-
-        clips.append(academy_clip)
+    text_x_start = 20 + logo_size + 15 if logo_path and os.path.exists(logo_path) else 30
+    text_width = WIDTH - text_x_start - 20
 
     if logo_path and os.path.exists(logo_path):
-
         logo = (
             ImageClip(logo_path)
-            .resized(width=70)
-            .with_position((20, HEIGHT - 115))
-            .with_duration(audio.duration + 1)
+            .resized(width=logo_size)
+            .with_position((20, footer_top))
+            .with_duration(duration)
         )
-
         clips.append(logo)
+
+    footer_y = footer_top
+
+    if signature:
+        signature_clip = TextClip(
+            text=signature,
+            font=FONT,
+            font_size=20,
+            color="white",
+            stroke_color="black",
+            stroke_width=1,
+            size=(text_width, None),
+            method="caption"
+        ).with_duration(duration)
+
+        signature_clip = signature_clip.with_position((text_x_start, footer_y))
+        clips.append(signature_clip)
+
+        footer_y += signature_clip.h + 4
+
+    if academy:
+        academy_clip = TextClip(
+            text=academy,
+            font=FONT,
+            font_size=16,
+            color="#d9d9d9",
+            stroke_color="black",
+            stroke_width=1,
+            size=(text_width, None),
+            method="caption"
+        ).with_duration(duration)
+
+        academy_clip = academy_clip.with_position((text_x_start, footer_y))
+        clips.append(academy_clip)
 
     video = CompositeVideoClip(
         clips,
@@ -179,7 +196,7 @@ async def generate_video(
     voice,
     speed
 ):
-    
+
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
     video_name = f"{uuid.uuid4().hex}.mp4"
@@ -205,10 +222,9 @@ async def generate_video(
             audio_file,
             voice,
             speed
-    )
+        )
 
         clip = create_clip(
-
             item["word"],
             item["arabic"],
             item["image"],
@@ -216,7 +232,6 @@ async def generate_video(
             signature,
             academy,
             logo_path
-
         )
 
         clips.append(clip)
@@ -226,8 +241,6 @@ async def generate_video(
     print("Saving video to:", output_path)
 
     try:
-        print("IMAGE =", item["image"])
-        print("IMAGE EXISTS =", os.path.exists(item["image"]))
         final.write_videofile(
             output_path,
             fps=30,
