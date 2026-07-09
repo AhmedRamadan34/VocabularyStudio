@@ -137,15 +137,16 @@ def create_clip(
     # شريط المعلومات السفلي: لوجو + توقيع + اسم الأكاديمية
     # كلهم بيتحسبوا بالنسبة لبعض عشان محدش يقص التاني
     # ---------------------------------------------------------
-    bottom_margin = 30
-    logo_size = 60
+    bottom_margin = 25
+    logo_size = 70
 
     footer_top = HEIGHT - bottom_margin - logo_size
 
-    text_x_start = 20 + logo_size + 15 if logo_path and os.path.exists(logo_path) else 30
+    has_logo = logo_path and os.path.exists(logo_path)
+    text_x_start = 20 + logo_size + 10 if has_logo else 30
     text_width = WIDTH - text_x_start - 20
 
-    if logo_path and os.path.exists(logo_path):
+    if has_logo:
         logo = (
             ImageClip(logo_path)
             .resized(width=logo_size)
@@ -154,24 +155,26 @@ def create_clip(
         )
         clips.append(logo)
 
-    footer_y = footer_top
+    # نبني الـ clips الأول عشان نعرف ارتفاعهم الحقيقي، وبعدين نوسطهم
+    # رأسيًا بالنسبة لمنطقة اللوجو (وليس بترتيب تنازلي ثابت زي الأول)
+    sig_clip = None
+    academy_clip = None
 
     if signature:
-        signature_clip = TextClip(
+        sig_clip = TextClip(
             text=signature,
             font=FONT,
             font_size=20,
             color="white",
             stroke_color="black",
             stroke_width=1,
-            size=(text_width, None),
-            method="caption"
+            size=(text_width, 34),
+            method="caption",
+            text_align="left",
+            horizontal_align="left",
+            vertical_align="center",
+            interline=0
         ).with_duration(duration)
-
-        signature_clip = signature_clip.with_position((text_x_start, footer_y))
-        clips.append(signature_clip)
-
-        footer_y += signature_clip.h + 4
 
     if academy:
         academy_clip = TextClip(
@@ -181,11 +184,27 @@ def create_clip(
             color="#d9d9d9",
             stroke_color="black",
             stroke_width=1,
-            size=(text_width, None),
-            method="caption"
+            size=(text_width, 28),
+            method="caption",
+            text_align="left",
+            horizontal_align="left",
+            vertical_align="center",
+            interline=0
         ).with_duration(duration)
 
-        academy_clip = academy_clip.with_position((text_x_start, footer_y))
+    # ارتفاع الكتلة الكلية (توقيع + أكاديمية) عشان نوسطها مع اللوجو
+    block_h = (sig_clip.h if sig_clip else 0) + (academy_clip.h if academy_clip else 0)
+    block_top = footer_top + (logo_size - block_h) // 2
+
+    current_text_y = block_top
+
+    if sig_clip:
+        sig_clip = sig_clip.with_position((text_x_start, current_text_y))
+        clips.append(sig_clip)
+        current_text_y += sig_clip.h
+
+    if academy_clip:
+        academy_clip = academy_clip.with_position((text_x_start, current_text_y))
         clips.append(academy_clip)
 
     video = CompositeVideoClip(
