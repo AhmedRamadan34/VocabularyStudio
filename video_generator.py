@@ -80,12 +80,14 @@ def create_clip(
         TextClip(
             text=word,
             font=FONT,
-            font_size=90,
+            font_size=58,
             color="white",
             stroke_color="black",
-            stroke_width=3
+            stroke_width=3,
+            method="caption",
+            size=(480, None)
         )
-        .with_position(("center", 700))
+        .with_position(("center", 660))
         .with_duration(audio.duration + 1)
     )
 
@@ -99,12 +101,14 @@ def create_clip(
             TextClip(
                 text=arabic,
                 font=FONT,
-                font_size=60,
+                font_size=42,
                 color="yellow",
                 stroke_color="black",
-                stroke_width=2
+                stroke_width=2,
+                method="caption",
+                size=(480, None)
             )
-            .with_position(("center", 770))
+            .with_position(("center", 735))
             .with_duration(audio.duration + 1)
         )
 
@@ -116,14 +120,14 @@ def create_clip(
             TextClip(
                 text=signature,
                 font=FONT,
-                font_size=18,
+                font_size=20,
                 color="white",
                 stroke_color="black",
                 stroke_width=1,
                 size=(420, None),
                 method="caption"
             )
-            .with_position((100, HEIGHT - 92))
+            .with_position((105, HEIGHT - 100))
             .with_duration(audio.duration + 1)
         )
 
@@ -135,14 +139,14 @@ def create_clip(
             TextClip(
                 text=academy,
                 font=FONT,
-                font_size=15,
+                font_size=16,
                 color="#d9d9d9",
                 stroke_color="black",
                 stroke_width=1,
                 size=(420, None),
                 method="caption"
             )
-            .with_position((100, HEIGHT - 65))
+            .with_position((105, HEIGHT - 70))
             .with_duration(audio.duration + 1)
         )
 
@@ -153,7 +157,7 @@ def create_clip(
         logo = (
             ImageClip(logo_path)
             .resized(width=70)
-            .with_position((20, HEIGHT - 105))
+            .with_position((20, HEIGHT - 115))
             .with_duration(audio.duration + 1)
         )
 
