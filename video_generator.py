@@ -20,10 +20,14 @@ HEIGHT = 1920
 
 VOICE = "en-US-JennyNeural"
 
-FONT = "fonts/tahoma.ttf"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-OUTPUT_FOLDER = "output"
-TEMP_FOLDER = "temp"
+FONT = os.path.join(BASE_DIR, "fonts", "tahoma.ttf")
+print("FONT =", FONT)
+print("FONT EXISTS =", os.path.exists(FONT))
+
+OUTPUT_FOLDER = os.path.join(BASE_DIR, "output")
+TEMP_FOLDER = os.path.join(BASE_DIR, "temp")
 
 os.makedirs(TEMP_FOLDER, exist_ok=True)
 
@@ -211,12 +215,15 @@ async def generate_video(
 
     final = concatenate_videoclips(clips)
 
+    print("Saving video to:", output_path)
+
     final.write_videofile(
-    output_path,
-    fps=30,
-    codec="libx264",
-    audio_codec="aac"
-)
+        output_path,
+        fps=30,
+        codec="libx264",
+        audio_codec="aac",
+        logger=None
+    )
 
     for clip in clips:
         clip.close()
