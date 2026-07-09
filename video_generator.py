@@ -15,8 +15,8 @@ from moviepy import (
     concatenate_videoclips
 )
 
-WIDTH = 1080
-HEIGHT = 1920
+WIDTH = 540
+HEIGHT = 960
 
 VOICE = "en-US-JennyNeural"
 
@@ -218,11 +218,16 @@ async def generate_video(
     print("Saving video to:", output_path)
 
     try:
+        print("IMAGE =", item["image"])
+        print("IMAGE EXISTS =", os.path.exists(item["image"]))
         final.write_videofile(
             output_path,
             fps=30,
             codec="libx264",
             audio_codec="aac",
+            preset="ultrafast",
+            threads=1,
+            logger="bar"
         )
     except Exception as e:
         print("VIDEO ERROR:", repr(e))
